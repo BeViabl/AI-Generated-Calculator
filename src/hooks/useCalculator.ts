@@ -267,8 +267,8 @@ export const useCalculator = () => {
       let newExpression = prevState.expression;
       let newOpenParentheses = prevState.openParentheses;
 
-      // Handle numbers and operators
-      if (/[\d+\-*/^.]/.test(input)) {
+      // Handle numbers, operators, and constants
+      if (/[\d+\-*/^.]/.test(input) || input === 'π' || input === 'e') {
         newExpression += input;
       } else if (input === '(') {
         newExpression += '(';
