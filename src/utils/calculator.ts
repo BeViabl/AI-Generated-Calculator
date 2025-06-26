@@ -22,29 +22,13 @@ export const calculateScientific = (value: number, operation: ScientificOperatio
   // Convert degrees to radians for trig functions if needed
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
   
-  // Helper to clean up floating point errors for trig functions
-  const cleanTrigResult = (result: number): number => {
-    // Only clean up values that are extremely close to 0, 1, or -1 (floating point errors)
-    if (Math.abs(result) < 1e-15) return 0;
-    if (Math.abs(result - 1) < 1e-15) return 1;
-    if (Math.abs(result + 1) < 1e-15) return -1;
-    return result;
-  };
-  
   switch (operation) {
     case 'sin':
-      return cleanTrigResult(Math.sin(angleMode === 'deg' ? toRadians(value) : value));
+      return Math.sin(angleMode === 'deg' ? toRadians(value) : value);
     case 'cos':
-      return cleanTrigResult(Math.cos(angleMode === 'deg' ? toRadians(value) : value));
+      return Math.cos(angleMode === 'deg' ? toRadians(value) : value);
     case 'tan':
-      // Special handling for tan at 90, 270 degrees etc.
-      if (angleMode === 'deg' && Math.abs((value % 180) - 90) < 1e-10) {
-        throw new Error('Undefined');
-      }
-      if (angleMode === 'rad' && Math.abs((value % Math.PI) - Math.PI/2) < 1e-10) {
-        throw new Error('Undefined');
-      }
-      return cleanTrigResult(Math.tan(angleMode === 'deg' ? toRadians(value) : value));
+      return Math.tan(angleMode === 'deg' ? toRadians(value) : value);
     case 'log':
       if (value <= 0) throw new Error('Invalid input for logarithm');
       return Math.log10(value);
@@ -87,25 +71,11 @@ export const formatDisplay = (value: string): string => {
   
   // Handle very large or very small numbers
   if (Math.abs(num) > 999999999 || (Math.abs(num) < 0.000001 && num !== 0)) {
-    return num.toExponential(6);
+    return num.toExponential(15);  // Increased precision to show more exact values
   }
   
-  // Round to handle floating-point errors (like 0.1 + 0.2 = 0.30000000000000004)
-  // We'll round to 14 decimal places to maintain precision while fixing common errors
-  const rounded = Math.round(num * 1e14) / 1e14;
-  
-  // If the rounded value is very close to the original, use the rounded version
-  if (Math.abs(rounded - num) < 1e-14) {
-    return rounded.toString();
-  }
-  
-  // Otherwise, use the original value
-  // Remove trailing zeros after decimal point
-  if (value.includes('.') && !value.includes('e')) {
-    return parseFloat(value).toString();
-  }
-  
-  return value;
+  // For normal numbers, just convert to string which shows the exact floating-point value
+  return num.toString();
 };
 
 // Mathematical constants
