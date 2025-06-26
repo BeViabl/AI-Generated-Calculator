@@ -11,6 +11,12 @@ const testExpressionEvaluator = () => {
   console.assert(evaluator.evaluate('3 * 4') === 12, 'Basic multiplication failed');
   console.assert(evaluator.evaluate('15 / 3') === 5, 'Basic division failed');
   
+  // Negative numbers
+  console.assert(evaluator.evaluate('-5 + 3') === -2, 'Negative number addition failed');
+  console.assert(evaluator.evaluate('5 + -3') === 2, 'Addition with negative failed');
+  console.assert(evaluator.evaluate('-5 * -3') === 15, 'Negative multiplication failed');
+  console.assert(evaluator.evaluate('(-5) * 3') === -15, 'Parenthesized negative failed');
+  
   // Parentheses
   console.assert(evaluator.evaluate('(2 + 3) * 4') === 20, 'Parentheses precedence failed');
   console.assert(evaluator.evaluate('2 * (3 + 4)') === 14, 'Parentheses precedence failed');
@@ -25,6 +31,12 @@ const testExpressionEvaluator = () => {
   console.assert(evaluator.evaluate('2 ^ 3') === 8, 'Power operation failed');
   console.assert(evaluator.evaluate('10 ^ 2') === 100, 'Power operation failed');
   console.assert(evaluator.evaluate('2 ^ 10') === 1024, 'Power operation failed');
+  
+  // Negative exponents
+  console.assert(evaluator.evaluate('10^-1') === 0.1, 'Negative exponent failed');
+  console.assert(evaluator.evaluate('10^-2') === 0.01, 'Negative exponent failed');
+  console.assert(evaluator.evaluate('10^-11') === 1e-11, 'Large negative exponent failed');
+  console.assert(evaluator.evaluate('2^-3') === 0.125, 'Negative exponent failed');
   
   // Large number expression (10^100) + 1
   const largeResult = evaluator.evaluate('(10^100) + 1');

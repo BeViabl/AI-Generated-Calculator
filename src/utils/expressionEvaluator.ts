@@ -72,8 +72,35 @@ export class ExpressionEvaluator {
         continue;
       }
 
-      // Operators and parentheses
-      if ('+-*/^'.includes(char)) {
+      // Handle minus sign (could be subtraction or negative number)
+      if (char === '-') {
+        // Check if this is a negative number (minus at start, after operator, or after left paren)
+        const lastToken = tokens[tokens.length - 1];
+        const isNegative = tokens.length === 0 || 
+                          (lastToken && (lastToken.type === 'operator' || lastToken.type === 'leftParen' || lastToken.type === 'function'));
+        
+        if (isNegative) {
+          // This is a negative number, read the number
+          i++; // Skip the minus sign
+          if (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.')) {
+            let num = '-';
+            while (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.' || expression[i] === 'e' || expression[i] === 'E')) {
+              num += expression[i];
+              i++;
+            }
+            tokens.push({ type: 'number', value: num });
+            continue;
+          } else {
+            // Just a minus operator
+            tokens.push({ type: 'operator', value: '-' });
+            continue;
+          }
+        } else {
+          // This is subtraction
+          tokens.push({ type: 'operator', value: '-' });
+          i++;
+        }
+      } else if ('+*/^'.includes(char)) {
         tokens.push({ type: 'operator', value: char });
         i++;
       } else if (char === '(') {

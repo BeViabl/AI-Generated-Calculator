@@ -130,7 +130,7 @@ export const Calculator: React.FC = () => {
         <Button label="1" onClick={() => handleExpressionInput('1')} className="number" />
         <Button label="2" onClick={() => handleExpressionInput('2')} className="number" />
         <Button label="3" onClick={() => handleExpressionInput('3')} className="number" />
-        <Button label="−" onClick={() => handleExpressionInput('-')} className="operation" ariaLabel="Subtract" />
+        <Button label="−" onClick={() => handleExpressionInput('-')} className="operation" ariaLabel="Subtract or negative" />
 
         <Button label="^" onClick={() => handleExpressionInput('^')} className="operation" ariaLabel="Power" />
         <Button label="0" onClick={() => handleExpressionInput('0')} className="number zero" />
