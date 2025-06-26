@@ -15,6 +15,7 @@ export const Calculator: React.FC = () => {
     toggleAngleMode,
     handleExpressionInput,
     handleExpressionFunction,
+    toggleLastNumberSign,
     evaluateExpression,
     handleMemoryClear,
     handleMemoryRecall,
@@ -132,7 +133,7 @@ export const Calculator: React.FC = () => {
         <Button label="3" onClick={() => handleExpressionInput('3')} className="number" />
         <Button label="−" onClick={() => handleExpressionInput('-')} className="operation" ariaLabel="Subtract" />
 
-        <Button label="(−)" onClick={() => handleExpressionInput('-')} className="negation" ariaLabel="Negative sign" />
+        <Button label="±" onClick={toggleLastNumberSign} className="negation" ariaLabel="Toggle sign" />
         <Button label="0" onClick={() => handleExpressionInput('0')} className="number" />
         <Button label="." onClick={() => handleExpressionInput('.')} ariaLabel="Decimal point" />
         <Button label="+" onClick={() => handleExpressionInput('+')} className="operation" ariaLabel="Add" />

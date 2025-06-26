@@ -308,6 +308,47 @@ export const useCalculator = () => {
     });
   }, []);
 
+  const toggleLastNumberSign = useCallback(() => {
+    setState((prevState) => {
+      if (!prevState.isExpressionMode || !prevState.expression) return prevState;
+
+      let expression = prevState.expression;
+      
+      // Find the last number in the expression
+      const regex = /(-?\d+\.?\d*)$/;
+      const match = expression.match(regex);
+      
+      if (match) {
+        const lastNumber = match[0];
+        const position = match.index!;
+        
+        // Toggle the sign
+        if (lastNumber.startsWith('-')) {
+          // Remove the negative sign
+          expression = expression.substring(0, position) + lastNumber.substring(1);
+        } else {
+          // Add negative sign, but check what comes before
+          const beforeNumber = expression.substring(0, position);
+          const lastChar = beforeNumber[beforeNumber.length - 1];
+          
+          // If the last character is an operator or opening parenthesis, just add the negative
+          if (!lastChar || '+-*/^('.includes(lastChar)) {
+            expression = beforeNumber + '-' + lastNumber;
+          } else {
+            // Otherwise, we need to wrap in parentheses
+            expression = beforeNumber + '(-' + lastNumber + ')';
+          }
+        }
+      }
+
+      return {
+        ...prevState,
+        expression: expression,
+        display: expression,
+      };
+    });
+  }, []);
+
   const evaluateExpression = useCallback(() => {
     setState((prevState) => {
       if (!prevState.isExpressionMode || !prevState.expression) return prevState;
@@ -419,6 +460,7 @@ export const useCalculator = () => {
     toggleExpressionMode,
     handleExpressionInput,
     handleExpressionFunction,
+    toggleLastNumberSign,
     evaluateExpression,
     handleMemoryClear,
     handleMemoryRecall,
