@@ -10,7 +10,6 @@ export const Calculator: React.FC = () => {
     hasMemory,
     isScientific,
     angleMode,
-    openParentheses,
     handleClear,
     toggleScientific,
     toggleAngleMode,
@@ -54,11 +53,6 @@ export const Calculator: React.FC = () => {
         </div>
       </div>
 
-      {openParentheses > 0 && (
-        <div className="parenthesis-indicator">
-          <span>{openParentheses} open parentheses</span>
-        </div>
-      )}
 
       {isScientific && (
         <div className="scientific-buttons">

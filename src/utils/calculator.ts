@@ -22,13 +22,29 @@ export const calculateScientific = (value: number, operation: ScientificOperatio
   // Convert degrees to radians for trig functions if needed
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
   
+  // Helper to clean up floating point errors for trig functions
+  const cleanTrigResult = (result: number): number => {
+    // If the result is very close to 0, 1, or -1, round to that value
+    if (Math.abs(result) < 1e-10) return 0;
+    if (Math.abs(result - 1) < 1e-10) return 1;
+    if (Math.abs(result + 1) < 1e-10) return -1;
+    return result;
+  };
+  
   switch (operation) {
     case 'sin':
-      return Math.sin(angleMode === 'deg' ? toRadians(value) : value);
+      return cleanTrigResult(Math.sin(angleMode === 'deg' ? toRadians(value) : value));
     case 'cos':
-      return Math.cos(angleMode === 'deg' ? toRadians(value) : value);
+      return cleanTrigResult(Math.cos(angleMode === 'deg' ? toRadians(value) : value));
     case 'tan':
-      return Math.tan(angleMode === 'deg' ? toRadians(value) : value);
+      // Special handling for tan at 90, 270 degrees etc.
+      if (angleMode === 'deg' && Math.abs((value % 180) - 90) < 1e-10) {
+        throw new Error('Undefined');
+      }
+      if (angleMode === 'rad' && Math.abs((value % Math.PI) - Math.PI/2) < 1e-10) {
+        throw new Error('Undefined');
+      }
+      return cleanTrigResult(Math.tan(angleMode === 'deg' ? toRadians(value) : value));
     case 'log':
       if (value <= 0) throw new Error('Invalid input for logarithm');
       return Math.log10(value);
@@ -63,6 +79,11 @@ export const formatDisplay = (value: string): string => {
   
   const num = parseFloat(value);
   if (isNaN(num)) return '0';
+  
+  // Handle numbers that are essentially zero (within floating point precision)
+  if (Math.abs(num) < 1e-10) {
+    return '0';
+  }
   
   // Handle very large or very small numbers
   if (Math.abs(num) > 999999999 || (Math.abs(num) < 0.000001 && num !== 0)) {
