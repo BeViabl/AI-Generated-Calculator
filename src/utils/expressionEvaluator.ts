@@ -43,7 +43,7 @@ export class ExpressionEvaluator {
       // Numbers (including decimals and scientific notation)
       if (/\d/.test(char) || (char === '.' && i + 1 < expression.length && /\d/.test(expression[i + 1]))) {
         let num = '';
-        while (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.' || expression[i] === 'e' || expression[i] === 'E' || (expression[i] === '-' && i > 0 && /[eE]/.test(expression[i - 1])))) {
+        while (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.' || expression[i] === 'e' || expression[i] === 'E' || ((expression[i] === '-' || expression[i] === '+') && i > 0 && /[eE]/.test(expression[i - 1])))) {
           num += expression[i];
           i++;
         }
@@ -88,7 +88,7 @@ export class ExpressionEvaluator {
           i++; // Skip the minus sign
           if (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.')) {
             let num = '-';
-            while (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.' || expression[i] === 'e' || expression[i] === 'E')) {
+            while (i < expression.length && (/\d/.test(expression[i]) || expression[i] === '.' || expression[i] === 'e' || expression[i] === 'E' || ((expression[i] === '-' || expression[i] === '+') && i > 0 && /[eE]/.test(expression[i - 1])))) {
               num += expression[i];
               i++;
             }
