@@ -88,7 +88,7 @@ export const Calculator: React.FC = () => {
           />
           
           <Button label="x²" onClick={() => handleExpressionInput('^2')} className="scientific" ariaLabel="Square" />
-          <Button label="^" onClick={() => handleExpressionInput('^')} className="scientific" ariaLabel="Power" />
+          <Button label="xʸ" onClick={() => handleExpressionInput('^')} className="scientific" ariaLabel="Power" />
           <Button 
             label="√" 
             onClick={() => handleExpressionFunction('sqrt')} 
@@ -130,10 +130,10 @@ export const Calculator: React.FC = () => {
         <Button label="1" onClick={() => handleExpressionInput('1')} className="number" />
         <Button label="2" onClick={() => handleExpressionInput('2')} className="number" />
         <Button label="3" onClick={() => handleExpressionInput('3')} className="number" />
-        <Button label="−" onClick={() => handleExpressionInput('-')} className="operation" ariaLabel="Subtract or negative" />
+        <Button label="−" onClick={() => handleExpressionInput('-')} className="operation" ariaLabel="Subtract" />
 
-        <Button label="^" onClick={() => handleExpressionInput('^')} className="operation" ariaLabel="Power" />
-        <Button label="0" onClick={() => handleExpressionInput('0')} className="number zero" />
+        <Button label="(−)" onClick={() => handleExpressionInput('-')} className="negation" ariaLabel="Negative sign" />
+        <Button label="0" onClick={() => handleExpressionInput('0')} className="number" />
         <Button label="." onClick={() => handleExpressionInput('.')} ariaLabel="Decimal point" />
         <Button label="+" onClick={() => handleExpressionInput('+')} className="operation" ariaLabel="Add" />
 

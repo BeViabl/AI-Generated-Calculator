@@ -172,6 +172,20 @@
   background-color: #21618c;
 }
 
+.calculator-button.negation {
+  background-color: #7f8c8d;
+  color: white;
+  font-weight: 600;
+}
+
+.calculator-button.negation:hover {
+  background-color: #718384;
+}
+
+.calculator-button.negation:active {
+  background-color: #5d6d6e;
+}
+
 @media (max-width: 480px) {
   .calculator-button {
     font-size: 1.25rem;
