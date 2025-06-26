@@ -4,7 +4,7 @@ import { calculate, calculateScientific, formatDisplay, CONSTANTS } from '../uti
 import { ExpressionEvaluator } from '../utils/expressionEvaluator';
 
 const initialState: CalculatorState = {
-  display: '0',
+  display: '',
   previousValue: null,
   currentValue: '0',
   operation: null,
@@ -13,7 +13,7 @@ const initialState: CalculatorState = {
   isScientific: false,
   angleMode: 'deg',
   expression: '',
-  isExpressionMode: false,
+  isExpressionMode: true,
   openParentheses: 0,
 };
 
@@ -288,7 +288,7 @@ export const useCalculator = () => {
       return {
         ...prevState,
         expression: newExpression,
-        display: newExpression || '0',
+        display: newExpression,
         openParentheses: newOpenParentheses,
       };
     });
@@ -378,54 +378,24 @@ export const useCalculator = () => {
   // Keyboard support
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (state.isExpressionMode) {
-        if (event.key >= '0' && event.key <= '9' || '+-*/^.'.includes(event.key)) {
-          handleExpressionInput(event.key);
-        } else if (event.key === '(') {
-          handleExpressionInput('(');
-        } else if (event.key === ')') {
-          handleExpressionInput(')');
-        } else if (event.key === 'Enter' || event.key === '=') {
-          evaluateExpression();
-        } else if (event.key === 'Escape') {
-          handleClear();
-        } else if (event.key === 'Backspace') {
-          handleExpressionInput('backspace');
-        }
-      } else {
-        if (event.key >= '0' && event.key <= '9') {
-          handleNumber(event.key);
-        } else if (event.key === '.') {
-          handleDecimal();
-        } else if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
-          handleOperation(event.key as Operation);
-        } else if (event.key === 'Enter' || event.key === '=') {
-          handleEquals();
-        } else if (event.key === 'Escape') {
-          handleClear();
-        } else if (event.key === 'Backspace') {
-          setState((prevState) => {
-            if (prevState.currentValue.length > 1) {
-              const newValue = prevState.currentValue.slice(0, -1);
-              return {
-                ...prevState,
-                currentValue: newValue,
-                display: newValue,
-              };
-            }
-            return {
-              ...prevState,
-              currentValue: '0',
-              display: '0',
-            };
-          });
-        }
+      if (event.key >= '0' && event.key <= '9' || '+-*/^.'.includes(event.key)) {
+        handleExpressionInput(event.key);
+      } else if (event.key === '(') {
+        handleExpressionInput('(');
+      } else if (event.key === ')') {
+        handleExpressionInput(')');
+      } else if (event.key === 'Enter' || event.key === '=') {
+        evaluateExpression();
+      } else if (event.key === 'Escape') {
+        handleClear();
+      } else if (event.key === 'Backspace') {
+        handleExpressionInput('backspace');
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleNumber, handleDecimal, handleOperation, handleEquals, handleClear, state.isExpressionMode, handleExpressionInput, evaluateExpression]);
+  }, [handleExpressionInput, evaluateExpression, handleClear]);
 
   return {
     display: state.display,

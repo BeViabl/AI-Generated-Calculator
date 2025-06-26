@@ -46,23 +46,15 @@
   margin-bottom: 16px;
 }
 
-.expression-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.parenthesis-counter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
+.parenthesis-indicator {
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: #e3f2fd;
   border-radius: 8px;
-  font-weight: 600;
-  color: #4a90e2;
-  padding: 0 16px;
-  min-height: 40px;
+  color: #1976d2;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .calculator-buttons {

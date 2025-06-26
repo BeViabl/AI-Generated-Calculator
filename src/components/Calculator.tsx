@@ -10,21 +10,10 @@ export const Calculator: React.FC = () => {
     hasMemory,
     isScientific,
     angleMode,
-    isExpressionMode,
     openParentheses,
-    handleNumber,
-    handleDecimal,
-    handleOperation,
-    handleScientificOperation,
-    handleEquals,
     handleClear,
-    handleClearEntry,
-    handleToggleSign,
-    handlePercent,
-    handleConstant,
     toggleScientific,
     toggleAngleMode,
-    toggleExpressionMode,
     handleExpressionInput,
     handleExpressionFunction,
     evaluateExpression,
@@ -44,12 +33,6 @@ export const Calculator: React.FC = () => {
           onClick={toggleScientific} 
           className="mode-toggle"
           ariaLabel={`Switch to ${isScientific ? 'basic' : 'scientific'} calculator`}
-        />
-        <Button 
-          label={isExpressionMode ? "Standard" : "Expression"} 
-          onClick={toggleExpressionMode} 
-          className="mode-toggle"
-          ariaLabel={`Switch to ${isExpressionMode ? 'standard' : 'expression'} mode`}
         />
         {isScientific && (
           <Button 
@@ -71,170 +54,96 @@ export const Calculator: React.FC = () => {
         </div>
       </div>
 
+      {openParentheses > 0 && (
+        <div className="parenthesis-indicator">
+          <span>{openParentheses} open parentheses</span>
+        </div>
+      )}
+
       {isScientific && (
         <div className="scientific-buttons">
           <Button 
             label="sin" 
-            onClick={() => isExpressionMode ? handleExpressionFunction('sin') : handleScientificOperation('sin')} 
+            onClick={() => handleExpressionFunction('sin')} 
             className="scientific" 
             ariaLabel="Sine" 
           />
           <Button 
             label="cos" 
-            onClick={() => isExpressionMode ? handleExpressionFunction('cos') : handleScientificOperation('cos')} 
+            onClick={() => handleExpressionFunction('cos')} 
             className="scientific" 
             ariaLabel="Cosine" 
           />
           <Button 
             label="tan" 
-            onClick={() => isExpressionMode ? handleExpressionFunction('tan') : handleScientificOperation('tan')} 
+            onClick={() => handleExpressionFunction('tan')} 
             className="scientific" 
             ariaLabel="Tangent" 
           />
           <Button 
             label="log" 
-            onClick={() => isExpressionMode ? handleExpressionFunction('log') : handleScientificOperation('log')} 
+            onClick={() => handleExpressionFunction('log')} 
             className="scientific" 
             ariaLabel="Logarithm base 10" 
           />
           <Button 
             label="ln" 
-            onClick={() => isExpressionMode ? handleExpressionFunction('ln') : handleScientificOperation('ln')} 
+            onClick={() => handleExpressionFunction('ln')} 
             className="scientific" 
             ariaLabel="Natural logarithm" 
           />
           
-          <Button label="x²" onClick={() => handleScientificOperation('x^2')} className="scientific" ariaLabel="Square" />
-          <Button label="^" onClick={() => isExpressionMode ? handleExpressionInput('^') : handleScientificOperation('x^y')} className="scientific" ariaLabel="Power" />
+          <Button label="x²" onClick={() => handleExpressionInput('^2')} className="scientific" ariaLabel="Square" />
+          <Button label="^" onClick={() => handleExpressionInput('^')} className="scientific" ariaLabel="Power" />
           <Button 
             label="√" 
-            onClick={() => isExpressionMode ? handleExpressionFunction('sqrt') : handleScientificOperation('sqrt')} 
+            onClick={() => handleExpressionFunction('sqrt')} 
             className="scientific" 
             ariaLabel="Square root" 
           />
-          <Button label="1/x" onClick={() => handleScientificOperation('1/x')} className="scientific" ariaLabel="Reciprocal" />
-          <Button label="eˣ" onClick={() => handleScientificOperation('e^x')} className="scientific" ariaLabel="e to the power of x" />
-          
           <Button 
             label="π" 
-            onClick={() => isExpressionMode ? handleExpressionInput('π') : handleConstant('PI')} 
+            onClick={() => handleExpressionInput('π')} 
             className="constant" 
             ariaLabel="Pi" 
           />
           <Button 
             label="e" 
-            onClick={() => isExpressionMode ? handleExpressionInput('e') : handleConstant('E')} 
+            onClick={() => handleExpressionInput('e')} 
             className="constant" 
             ariaLabel="Euler's number" 
           />
-          <Button label="10ˣ" onClick={() => handleScientificOperation('10^x')} className="scientific" ariaLabel="10 to the power of x" />
         </div>
       )}
 
-      {isExpressionMode && (
-        <div className="expression-buttons">
-          <Button label="(" onClick={() => handleExpressionInput('(')} className="parenthesis" ariaLabel="Left parenthesis" />
-          <Button label=")" onClick={() => handleExpressionInput(')')} className="parenthesis" ariaLabel="Right parenthesis" />
-          <div className="parenthesis-counter" aria-label={`${openParentheses} open parentheses`}>
-            {openParentheses > 0 && `(${openParentheses})`}
-          </div>
-        </div>
-      )}
 
       <div className="calculator-buttons">
         <Button label="AC" onClick={handleClear} className="clear" ariaLabel="All Clear" />
-        <Button label="CE" onClick={handleClearEntry} className="clear" ariaLabel="Clear Entry" />
-        <Button label="%" onClick={handlePercent} className="operation" ariaLabel="Percent" />
-        <Button 
-          label="÷" 
-          onClick={() => isExpressionMode ? handleExpressionInput('/') : handleOperation('/')} 
-          className="operation" 
-          ariaLabel="Divide" 
-        />
+        <Button label="⌫" onClick={() => handleExpressionInput('backspace')} className="clear" ariaLabel="Backspace" />
+        <Button label="(" onClick={() => handleExpressionInput('(')} className="parenthesis" ariaLabel="Left parenthesis" />
+        <Button label=")" onClick={() => handleExpressionInput(')')} className="parenthesis" ariaLabel="Right parenthesis" />
 
-        <Button 
-          label="7" 
-          onClick={() => isExpressionMode ? handleExpressionInput('7') : handleNumber('7')} 
-          className="number" 
-        />
-        <Button 
-          label="8" 
-          onClick={() => isExpressionMode ? handleExpressionInput('8') : handleNumber('8')} 
-          className="number" 
-        />
-        <Button 
-          label="9" 
-          onClick={() => isExpressionMode ? handleExpressionInput('9') : handleNumber('9')} 
-          className="number" 
-        />
-        <Button 
-          label="×" 
-          onClick={() => isExpressionMode ? handleExpressionInput('*') : handleOperation('*')} 
-          className="operation" 
-          ariaLabel="Multiply" 
-        />
+        <Button label="7" onClick={() => handleExpressionInput('7')} className="number" />
+        <Button label="8" onClick={() => handleExpressionInput('8')} className="number" />
+        <Button label="9" onClick={() => handleExpressionInput('9')} className="number" />
+        <Button label="÷" onClick={() => handleExpressionInput('/')} className="operation" ariaLabel="Divide" />
 
-        <Button 
-          label="4" 
-          onClick={() => isExpressionMode ? handleExpressionInput('4') : handleNumber('4')} 
-          className="number" 
-        />
-        <Button 
-          label="5" 
-          onClick={() => isExpressionMode ? handleExpressionInput('5') : handleNumber('5')} 
-          className="number" 
-        />
-        <Button 
-          label="6" 
-          onClick={() => isExpressionMode ? handleExpressionInput('6') : handleNumber('6')} 
-          className="number" 
-        />
-        <Button 
-          label="−" 
-          onClick={() => isExpressionMode ? handleExpressionInput('-') : handleOperation('-')} 
-          className="operation" 
-          ariaLabel="Subtract" 
-        />
+        <Button label="4" onClick={() => handleExpressionInput('4')} className="number" />
+        <Button label="5" onClick={() => handleExpressionInput('5')} className="number" />
+        <Button label="6" onClick={() => handleExpressionInput('6')} className="number" />
+        <Button label="×" onClick={() => handleExpressionInput('*')} className="operation" ariaLabel="Multiply" />
 
-        <Button 
-          label="1" 
-          onClick={() => isExpressionMode ? handleExpressionInput('1') : handleNumber('1')} 
-          className="number" 
-        />
-        <Button 
-          label="2" 
-          onClick={() => isExpressionMode ? handleExpressionInput('2') : handleNumber('2')} 
-          className="number" 
-        />
-        <Button 
-          label="3" 
-          onClick={() => isExpressionMode ? handleExpressionInput('3') : handleNumber('3')} 
-          className="number" 
-        />
-        <Button 
-          label="+" 
-          onClick={() => isExpressionMode ? handleExpressionInput('+') : handleOperation('+')} 
-          className="operation" 
-          ariaLabel="Add" 
-        />
+        <Button label="1" onClick={() => handleExpressionInput('1')} className="number" />
+        <Button label="2" onClick={() => handleExpressionInput('2')} className="number" />
+        <Button label="3" onClick={() => handleExpressionInput('3')} className="number" />
+        <Button label="−" onClick={() => handleExpressionInput('-')} className="operation" ariaLabel="Subtract" />
 
-        <Button label="±" onClick={handleToggleSign} ariaLabel="Toggle sign" />
-        <Button 
-          label="0" 
-          onClick={() => isExpressionMode ? handleExpressionInput('0') : handleNumber('0')} 
-          className="number zero" 
-        />
-        <Button 
-          label="." 
-          onClick={() => isExpressionMode ? handleExpressionInput('.') : handleDecimal()} 
-          ariaLabel="Decimal point" 
-        />
-        <Button 
-          label="=" 
-          onClick={() => isExpressionMode ? evaluateExpression() : handleEquals()} 
-          className="equals" 
-          ariaLabel="Equals" 
-        />
+        <Button label="^" onClick={() => handleExpressionInput('^')} className="operation" ariaLabel="Power" />
+        <Button label="0" onClick={() => handleExpressionInput('0')} className="number zero" />
+        <Button label="." onClick={() => handleExpressionInput('.')} ariaLabel="Decimal point" />
+        <Button label="+" onClick={() => handleExpressionInput('+')} className="operation" ariaLabel="Add" />
+
+        <Button label="=" onClick={() => evaluateExpression()} className="equals equals-wide" ariaLabel="Equals" />
       </div>
 
       <div className="keyboard-hint" aria-hidden="true">

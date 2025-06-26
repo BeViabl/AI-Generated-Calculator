@@ -69,6 +69,10 @@
   background-color: #3d8b3d;
 }
 
+.calculator-button.equals-wide {
+  grid-column: span 4;
+}
+
 .calculator-button.clear {
   background-color: #d9534f;
   color: white;
