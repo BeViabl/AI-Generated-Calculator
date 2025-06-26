@@ -268,8 +268,18 @@ export const useCalculator = () => {
       let newOpenParentheses = prevState.openParentheses;
 
       // Handle numbers, operators, and constants
-      if (/[\d+\-*/^.]/.test(input) || input === 'π' || input === 'e') {
+      if (/[\d+\-*/^.]/.test(input) || input === 'π') {
         newExpression += input;
+      } else if (input === 'e') {
+        // Check if this is part of scientific notation (e.g., 1e-16) or Euler's constant
+        const lastChar = newExpression[newExpression.length - 1];
+        if (lastChar && /\d/.test(lastChar)) {
+          // If preceded by a digit, it's likely scientific notation
+          newExpression += 'e';
+        } else {
+          // Otherwise, it's Euler's constant
+          newExpression += 'e';
+        }
       } else if (input === '(') {
         newExpression += '(';
         newOpenParentheses++;
