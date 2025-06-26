@@ -267,10 +267,15 @@ export const useCalculator = () => {
       let newExpression = prevState.expression;
       let newOpenParentheses = prevState.openParentheses;
 
-      // Handle numbers, operators, and constants
-      if (/[\d+\-*/^.]/.test(input) || input === 'π') {
-        newExpression += input;
-      } else if (input === 'e') {
+      // If we're waiting for a new value and user types a number, replace the expression
+      if (prevState.waitingForNewValue && /\d/.test(input)) {
+        newExpression = input;
+        newOpenParentheses = 0;
+      } else {
+        // Handle numbers, operators, and constants
+        if (/[\d+\-*/^.]/.test(input) || input === 'π') {
+          newExpression += input;
+        } else if (input === 'e') {
         // Check if this is part of scientific notation (e.g., 1e-16) or Euler's constant
         const lastChar = newExpression[newExpression.length - 1];
         if (lastChar && /\d/.test(lastChar)) {
@@ -294,12 +299,14 @@ export const useCalculator = () => {
           newExpression = newExpression.slice(0, -1);
         }
       }
+      } // Close the else block
 
       return {
         ...prevState,
         expression: newExpression,
         display: newExpression,
         openParentheses: newOpenParentheses,
+        waitingForNewValue: false, // Reset this flag when user starts typing
       };
     });
   }, []);
