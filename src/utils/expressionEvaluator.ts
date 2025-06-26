@@ -1,5 +1,8 @@
-import { calculateScientific, CONSTANTS } from './calculator';
+import Decimal from 'decimal.js';
 import { ScientificOperation } from '../types/calculator';
+
+// Configure Decimal for high precision
+Decimal.set({ precision: 50 });
 
 type Token = {
   type: 'number' | 'operator' | 'function' | 'leftParen' | 'rightParen' | 'constant';
@@ -20,7 +23,8 @@ export class ExpressionEvaluator {
 
     const tokens = this.tokenize(expression);
     const postfix = this.toPostfix(tokens);
-    return this.evaluatePostfix(postfix);
+    const result = this.evaluatePostfix(postfix);
+    return result.toNumber();
   }
 
   private tokenize(expression: string): Token[] {
@@ -173,14 +177,21 @@ export class ExpressionEvaluator {
     return output;
   }
 
-  private evaluatePostfix(tokens: Token[]): number {
-    const stack: number[] = [];
+  private evaluatePostfix(tokens: Token[]): Decimal {
+    const stack: Decimal[] = [];
 
     for (const token of tokens) {
       if (token.type === 'number') {
-        stack.push(parseFloat(token.value));
+        stack.push(new Decimal(token.value));
       } else if (token.type === 'constant') {
-        stack.push(CONSTANTS[token.value as keyof typeof CONSTANTS]);
+        if (token.value === 'PI') {
+          // Use Decimal's pi with high precision
+          // We need to use the string representation to maintain full precision
+          stack.push(new Decimal('3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679'));
+        } else if (token.value === 'E') {
+          // Use Decimal's e with high precision
+          stack.push(new Decimal('2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274'));
+        }
       } else if (token.type === 'operator') {
         if (stack.length < 2) {
           throw new Error('Invalid expression');
@@ -190,20 +201,20 @@ export class ExpressionEvaluator {
         
         switch (token.value) {
           case '+':
-            stack.push(a + b);
+            stack.push(a.plus(b));
             break;
           case '-':
-            stack.push(a - b);
+            stack.push(a.minus(b));
             break;
           case '*':
-            stack.push(a * b);
+            stack.push(a.times(b));
             break;
           case '/':
-            if (b === 0) throw new Error('Division by zero');
-            stack.push(a / b);
+            if (b.isZero()) throw new Error('Division by zero');
+            stack.push(a.dividedBy(b));
             break;
           case '^':
-            stack.push(Math.pow(a, b));
+            stack.push(a.pow(b));
             break;
         }
       } else if (token.type === 'function') {
@@ -213,7 +224,7 @@ export class ExpressionEvaluator {
         const a = stack.pop()!;
         
         try {
-          const result = calculateScientific(a, token.value as ScientificOperation, this.angleMode);
+          const result = this.calculateScientificDecimal(a, token.value as ScientificOperation);
           stack.push(result);
         } catch (error) {
           throw new Error(`Function error: ${error}`);
@@ -226,5 +237,71 @@ export class ExpressionEvaluator {
     }
 
     return stack[0];
+  }
+
+  private calculateScientificDecimal(value: Decimal, operation: ScientificOperation): Decimal {
+    // Get exact pi value - same as used for PI constant
+    const pi = new Decimal('3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679');
+    
+    // Convert degrees to radians for trig functions if needed
+    const toRadians = (degrees: Decimal) => degrees.times(pi).dividedBy(180);
+    
+    // For trig functions, check if the input is a multiple of pi for exact results
+    const checkExactTrigValue = (radianValue: Decimal): Decimal | null => {
+      // Check if value is n*π
+      const nPi = radianValue.dividedBy(pi);
+      if (nPi.mod(1).abs().lt(new Decimal('1e-40'))) {
+        const n = nPi.round();
+        // sin(n*π) = 0 for all integer n
+        if (operation === 'sin') return new Decimal(0);
+        // cos(n*π) = (-1)^n
+        if (operation === 'cos') return n.mod(2).eq(0) ? new Decimal(1) : new Decimal(-1);
+        // tan(n*π) = 0 for all integer n
+        if (operation === 'tan') return new Decimal(0);
+      }
+      
+      // Check if value is (n + 0.5)*π
+      const nPlusHalf = radianValue.dividedBy(pi).minus(0.5);
+      if (nPlusHalf.mod(1).abs().lt(new Decimal('1e-40'))) {
+        const n = nPlusHalf.round();
+        // sin((n + 0.5)*π) = (-1)^n
+        if (operation === 'sin') return n.mod(2).eq(0) ? new Decimal(1) : new Decimal(-1);
+        // cos((n + 0.5)*π) = 0
+        if (operation === 'cos') return new Decimal(0);
+        // tan((n + 0.5)*π) = undefined (would throw error)
+        if (operation === 'tan') throw new Error('Undefined: tan of odd multiple of π/2');
+      }
+      
+      return null;
+    };
+    
+    switch (operation) {
+      case 'sin': {
+        const radianValue = this.angleMode === 'deg' ? toRadians(value) : value;
+        const exact = checkExactTrigValue(radianValue);
+        return exact !== null ? exact : Decimal.sin(radianValue);
+      }
+      case 'cos': {
+        const radianValue = this.angleMode === 'deg' ? toRadians(value) : value;
+        const exact = checkExactTrigValue(radianValue);
+        return exact !== null ? exact : Decimal.cos(radianValue);
+      }
+      case 'tan': {
+        const radianValue = this.angleMode === 'deg' ? toRadians(value) : value;
+        const exact = checkExactTrigValue(radianValue);
+        return exact !== null ? exact : Decimal.tan(radianValue);
+      }
+      case 'log':
+        if (value.lte(0)) throw new Error('Invalid input for logarithm');
+        return Decimal.log10(value);
+      case 'ln':
+        if (value.lte(0)) throw new Error('Invalid input for natural logarithm');
+        return Decimal.ln(value);
+      case 'sqrt':
+        if (value.lt(0)) throw new Error('Invalid input for square root');
+        return value.sqrt();
+      default:
+        throw new Error('Unknown operation');
+    }
   }
 }

@@ -64,18 +64,35 @@ export const formatDisplay = (value: string): string => {
   const num = parseFloat(value);
   if (isNaN(num)) return '0';
   
+  // Check if the number has more than 16 significant digits (beyond double precision)
+  // In that case, just return the string as-is to preserve precision
+  const absNum = Math.abs(num);
+  if (value.replace(/[^\d]/g, '').length > 16 && !value.includes('e')) {
+    return value;
+  }
+  
   // Only treat as zero if it's actually zero
   if (num === 0) {
     return '0';
   }
   
   // Handle very large or very small numbers
-  if (Math.abs(num) > 999999999 || (Math.abs(num) < 0.000001 && num !== 0)) {
-    return num.toExponential(15);  // Increased precision to show more exact values
+  if (absNum > 999999999 || (absNum < 0.000001 && num !== 0)) {
+    // Check if it's a very round number in scientific notation
+    const exp = num.toExponential();
+    const parts = exp.split('e');
+    const mantissa = parseFloat(parts[0]);
+    // If mantissa is very simple (like 1, 2, 5), show short form
+    if (Number.isInteger(mantissa * 10) && Math.abs(mantissa) < 10) {
+      return exp;
+    }
+    // Otherwise show more precision
+    return num.toExponential(15);
   }
   
-  // For normal numbers, just convert to string which shows the exact floating-point value
-  return num.toString();
+  // For normal numbers, return string representation
+  // This will show exact values like 0.3 as "0.3" and 0.30000000000000004 as is
+  return value;
 };
 
 // Mathematical constants
