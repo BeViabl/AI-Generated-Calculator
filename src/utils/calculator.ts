@@ -90,6 +90,16 @@ export const formatDisplay = (value: string): string => {
     return num.toExponential(6);
   }
   
+  // Round to handle floating-point errors (like 0.1 + 0.2 = 0.30000000000000004)
+  // We'll round to 14 decimal places to maintain precision while fixing common errors
+  const rounded = Math.round(num * 1e14) / 1e14;
+  
+  // If the rounded value is very close to the original, use the rounded version
+  if (Math.abs(rounded - num) < 1e-14) {
+    return rounded.toString();
+  }
+  
+  // Otherwise, use the original value
   // Remove trailing zeros after decimal point
   if (value.includes('.') && !value.includes('e')) {
     return parseFloat(value).toString();
