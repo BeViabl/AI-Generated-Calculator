@@ -24,10 +24,10 @@ export const calculateScientific = (value: number, operation: ScientificOperatio
   
   // Helper to clean up floating point errors for trig functions
   const cleanTrigResult = (result: number): number => {
-    // If the result is very close to 0, 1, or -1, round to that value
-    if (Math.abs(result) < 1e-10) return 0;
-    if (Math.abs(result - 1) < 1e-10) return 1;
-    if (Math.abs(result + 1) < 1e-10) return -1;
+    // Only clean up values that are extremely close to 0, 1, or -1 (floating point errors)
+    if (Math.abs(result) < 1e-15) return 0;
+    if (Math.abs(result - 1) < 1e-15) return 1;
+    if (Math.abs(result + 1) < 1e-15) return -1;
     return result;
   };
   
@@ -80,8 +80,8 @@ export const formatDisplay = (value: string): string => {
   const num = parseFloat(value);
   if (isNaN(num)) return '0';
   
-  // Handle numbers that are essentially zero (within floating point precision)
-  if (Math.abs(num) < 1e-10) {
+  // Only treat as zero if it's actually zero
+  if (num === 0) {
     return '0';
   }
   
