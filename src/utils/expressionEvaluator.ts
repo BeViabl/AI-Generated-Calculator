@@ -16,7 +16,7 @@ export class ExpressionEvaluator {
     this.angleMode = angleMode;
   }
 
-  evaluate(expression: string): number {
+  evaluate(expression: string): number | string {
     if (!expression || expression.trim() === '') {
       throw new Error('Empty expression');
     }
@@ -24,7 +24,15 @@ export class ExpressionEvaluator {
     const tokens = this.tokenize(expression);
     const postfix = this.toPostfix(tokens);
     const result = this.evaluatePostfix(postfix);
-    return result.toNumber();
+    
+    // Check if the result is too small or too large for JavaScript number
+    const num = result.toNumber();
+    if ((num === 0 && !result.isZero()) || !isFinite(num)) {
+      // Return string representation for numbers outside JavaScript's range
+      return result.toExponential();
+    }
+    
+    return num;
   }
 
   private tokenize(expression: string): Token[] {

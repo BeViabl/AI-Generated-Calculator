@@ -61,6 +61,16 @@ export const calculateScientific = (value: number, operation: ScientificOperatio
 export const formatDisplay = (value: string): string => {
   if (value === 'Error') return value;
   
+  // If the value is already in exponential notation and parseFloat would lose precision,
+  // just return it as-is
+  if (value.includes('e') || value.includes('E')) {
+    // Check if it's a valid exponential notation
+    const parts = value.toLowerCase().split('e');
+    if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
+      return value;
+    }
+  }
+  
   const num = parseFloat(value);
   if (isNaN(num)) return '0';
   
@@ -71,8 +81,8 @@ export const formatDisplay = (value: string): string => {
     return value;
   }
   
-  // Only treat as zero if it's actually zero
-  if (num === 0) {
+  // Only treat as zero if it's actually zero and the original string was "0"
+  if (num === 0 && (value === '0' || value === '0.0' || value === '0.00')) {
     return '0';
   }
   
