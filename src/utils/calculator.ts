@@ -61,18 +61,33 @@ export const calculateScientific = (value: number, operation: ScientificOperatio
 export const formatDisplay = (value: string): string => {
   if (value === 'Error') return value;
   
-  // If the value is already in exponential notation and parseFloat would lose precision,
-  // just return it as-is
+  // If the value is already in exponential notation, check if it's valid
   if (value.includes('e') || value.includes('E')) {
-    // Check if it's a valid exponential notation
     const parts = value.toLowerCase().split('e');
-    if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
-      return value;
+    if (parts.length === 2) {
+      const mantissa = parseFloat(parts[0]);
+      const exponent = parseFloat(parts[1]);
+      
+      // Check if both parts are valid numbers
+      if (!isNaN(mantissa) && !isNaN(exponent)) {
+        // Check if the exponent is too large for JavaScript's parseFloat
+        // JavaScript's max exponent is about 308, so anything larger will become Infinity
+        if (Math.abs(exponent) > 308) {
+          // Return the string as-is for very large/small exponents
+          return value;
+        }
+      }
     }
   }
   
   const num = parseFloat(value);
   if (isNaN(num)) return '0';
+  
+  // If parseFloat returned Infinity but the original string was valid scientific notation,
+  // return the original string
+  if (!isFinite(num) && value.match(/^-?\d+\.?\d*e[+-]?\d+$/i)) {
+    return value;
+  }
   
   // Check if the number has more than 16 significant digits (beyond double precision)
   // In that case, just return the string as-is to preserve precision
