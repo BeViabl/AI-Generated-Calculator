@@ -256,9 +256,19 @@ export class ExpressionEvaluator {
     
     // For trig functions, check if the input is a multiple of pi for exact results
     const checkExactTrigValue = (radianValue: Decimal): Decimal | null => {
+      // Only check for exact values if the number is reasonably small
+      // For very large numbers, the precision required to determine if it's a multiple of π
+      // exceeds our capabilities
+      if (radianValue.abs().gt(new Decimal('1e15'))) {
+        return null; // Too large to determine exact multiples of π
+      }
+      
       // Check if value is n*π
       const nPi = radianValue.dividedBy(pi);
-      if (nPi.mod(1).abs().lt(new Decimal('1e-40'))) {
+      const remainder = nPi.mod(1);
+      
+      // Check if it's very close to an integer
+      if (remainder.abs().lt(new Decimal('1e-40')) || remainder.abs().gt(new Decimal('0.999999999999999999999999999999999999999'))) {
         const n = nPi.round();
         // sin(n*π) = 0 for all integer n
         if (operation === 'sin') return new Decimal(0);
@@ -270,7 +280,9 @@ export class ExpressionEvaluator {
       
       // Check if value is (n + 0.5)*π
       const nPlusHalf = radianValue.dividedBy(pi).minus(0.5);
-      if (nPlusHalf.mod(1).abs().lt(new Decimal('1e-40'))) {
+      const remainderHalf = nPlusHalf.mod(1);
+      
+      if (remainderHalf.abs().lt(new Decimal('1e-40')) || remainderHalf.abs().gt(new Decimal('0.999999999999999999999999999999999999999'))) {
         const n = nPlusHalf.round();
         // sin((n + 0.5)*π) = (-1)^n
         if (operation === 'sin') return n.mod(2).eq(0) ? new Decimal(1) : new Decimal(-1);
@@ -287,17 +299,58 @@ export class ExpressionEvaluator {
       case 'sin': {
         const radianValue = this.angleMode === 'deg' ? toRadians(value) : value;
         const exact = checkExactTrigValue(radianValue);
-        return exact !== null ? exact : Decimal.sin(radianValue);
+        if (exact !== null) return exact;
+        
+        try {
+          return Decimal.sin(radianValue);
+        } catch (err) {
+          // For very large numbers, Decimal.js can't compute sin due to precision limits
+          // Try to reduce modulo 2π with available precision
+          try {
+            const twoPi = pi.times(2);
+            const reduced = radianValue.mod(twoPi);
+            return Decimal.sin(reduced);
+          } catch (err2) {
+            // If even modulo fails, the number is too large to meaningfully compute sin
+            // Sin of very large numbers oscillates rapidly and is essentially undefined
+            // without extreme precision. Return NaN to indicate this.
+            throw new Error('Input too large for trigonometric function');
+          }
+        }
       }
       case 'cos': {
         const radianValue = this.angleMode === 'deg' ? toRadians(value) : value;
         const exact = checkExactTrigValue(radianValue);
-        return exact !== null ? exact : Decimal.cos(radianValue);
+        if (exact !== null) return exact;
+        
+        try {
+          return Decimal.cos(radianValue);
+        } catch (err) {
+          try {
+            const twoPi = pi.times(2);
+            const reduced = radianValue.mod(twoPi);
+            return Decimal.cos(reduced);
+          } catch (err2) {
+            throw new Error('Input too large for trigonometric function');
+          }
+        }
       }
       case 'tan': {
         const radianValue = this.angleMode === 'deg' ? toRadians(value) : value;
         const exact = checkExactTrigValue(radianValue);
-        return exact !== null ? exact : Decimal.tan(radianValue);
+        if (exact !== null) return exact;
+        
+        try {
+          return Decimal.tan(radianValue);
+        } catch (err) {
+          try {
+            const twoPi = pi.times(2);
+            const reduced = radianValue.mod(twoPi);
+            return Decimal.tan(reduced);
+          } catch (err2) {
+            throw new Error('Input too large for trigonometric function');
+          }
+        }
       }
       case 'log':
         if (value.lte(0)) throw new Error('Invalid input for logarithm');
