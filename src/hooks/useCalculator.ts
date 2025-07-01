@@ -15,6 +15,7 @@ const initialState: CalculatorState = {
   expression: '',
   isExpressionMode: true,
   openParentheses: 0,
+  previousResult: null,
 };
 
 export const useCalculator = () => {
@@ -187,13 +188,14 @@ export const useCalculator = () => {
   }, []);
 
   const handleClear = useCallback(() => {
-    setState({
+    setState((prevState) => ({
       ...initialState,
-      isScientific: state.isScientific,
-      angleMode: state.angleMode,
-      isExpressionMode: state.isExpressionMode,
-    });
-  }, [state.isScientific, state.angleMode, state.isExpressionMode]);
+      isScientific: prevState.isScientific,
+      angleMode: prevState.angleMode,
+      isExpressionMode: prevState.isExpressionMode,
+      previousResult: prevState.previousResult,
+    }));
+  }, []);
 
   const handleClearEntry = useCallback(() => {
     setState((prevState) => ({
@@ -388,6 +390,7 @@ export const useCalculator = () => {
           currentValue: formattedResult,
           openParentheses: 0,
           waitingForNewValue: true,
+          previousResult: expression + ' = ' + formattedResult,
         };
       } catch (error) {
         return {
@@ -397,6 +400,7 @@ export const useCalculator = () => {
           currentValue: '0',
           openParentheses: 0,
           waitingForNewValue: true,
+          previousResult: prevState.expression + ' = Error',
         };
       }
     });
@@ -457,6 +461,7 @@ export const useCalculator = () => {
 
   return {
     display: state.display,
+    previousResult: state.previousResult,
     hasMemory: state.memory !== 0,
     isScientific: state.isScientific,
     angleMode: state.angleMode,

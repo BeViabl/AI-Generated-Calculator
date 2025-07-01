@@ -13,4 +13,5 @@ export interface CalculatorState {
   expression: string;
   isExpressionMode: boolean;
   openParentheses: number;
+  previousResult: string | null;
 }

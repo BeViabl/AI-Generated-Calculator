@@ -2,31 +2,86 @@
   background-color: #2d2d2d;
   color: #ffffff;
   padding: 20px;
-  text-align: right;
   margin-bottom: 10px;
   border-radius: 8px;
-  min-height: 80px;
+  min-height: 120px;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: center;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.display-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  text-align: right;
+}
+
+.display-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .display-value {
   font-size: 2.5rem;
   font-weight: 300;
-  word-break: break-all;
-  overflow-wrap: break-word;
-  max-width: 100%;
+  white-space: nowrap;
+  display: inline-block;
+  padding-left: 40px; /* Space for fade effect */
+}
+
+/* Fade effect for overflowing content */
+.display::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, #2d2d2d 0%, #2d2d2d 20%, rgba(45, 45, 45, 0) 100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.display.has-overflow::before {
+  opacity: 1;
+}
+
+/* Previous result styling */
+.previous-result {
+  font-size: 1rem;
+  color: #888;
+  text-align: right;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 5px;
 }
 
 @media (max-width: 480px) {
   .display {
     padding: 15px;
-    min-height: 60px;
+    min-height: 100px;
   }
 
   .display-value {
     font-size: 2rem;
+    padding-left: 30px; /* Smaller fade area on mobile */
+  }
+  
+  .display::before {
+    width: 30px;
+  }
+  
+  .previous-result {
+    font-size: 0.875rem;
+    margin-bottom: 6px;
   }
 }

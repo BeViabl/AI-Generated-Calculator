@@ -7,6 +7,7 @@ import './Calculator.css';
 export const Calculator: React.FC = () => {
   const {
     display,
+    previousResult,
     hasMemory,
     isScientific,
     angleMode,
@@ -25,7 +26,7 @@ export const Calculator: React.FC = () => {
 
   return (
     <div className="calculator" role="application" aria-label="Calculator">
-      <Display value={display} />
+      <Display value={display} previousResult={previousResult} />
       
       <div className="mode-controls">
         <Button 
