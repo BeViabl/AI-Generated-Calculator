@@ -25,9 +25,7 @@ export const Display: React.FC<DisplayProps> = ({ value, previousResult }) => {
   
   return (
     <div className={`display ${isOverflowing ? 'has-overflow' : ''}`} role="textbox" aria-label="Calculator display" aria-readonly="true">
-      {previousResult && (
-        <div className="previous-result">{previousResult}</div>
-      )}
+      <div className="previous-result">{previousResult || '\u00A0'}</div>
       <div 
         ref={scrollContainerRef}
         className="display-scroll-container"
