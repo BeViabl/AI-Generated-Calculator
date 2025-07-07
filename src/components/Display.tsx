@@ -11,13 +11,12 @@ export const Display: React.FC<DisplayProps> = ({ value, previousResult }) => {
   const [isOverflowing, setIsOverflowing] = useState(false);
   
   const formatNumberWithCommas = (str: string): string => {
-    // Check if it's a pure number (not an expression with operators)
-    if (/^-?\d+(\.\d+)?$/.test(str)) {
-      const parts = str.split('.');
+    // Replace all numbers in the string with comma-formatted versions
+    return str.replace(/\d+(\.\d+)?/g, (match) => {
+      const parts = match.split('.');
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       return parts.join('.');
-    }
-    return str;
+    });
   };
   
   useEffect(() => {
